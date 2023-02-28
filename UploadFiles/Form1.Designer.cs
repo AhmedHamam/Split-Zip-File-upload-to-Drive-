@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            button1 = new Button();
+            BtnUploadToDrive = new Button();
             radioButton1 = new RadioButton();
             radioButton2 = new RadioButton();
             textBox1 = new TextBox();
@@ -50,15 +50,16 @@
             ((System.ComponentModel.ISupportInitialize)NudSize).BeginInit();
             SuspendLayout();
             // 
-            // button1
+            // BtnUploadToDrive
             // 
-            button1.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            button1.Location = new Point(47, 334);
-            button1.Name = "button1";
-            button1.Size = new Size(203, 48);
-            button1.TabIndex = 0;
-            button1.Text = "Upload To Google Drive";
-            button1.UseVisualStyleBackColor = true;
+            BtnUploadToDrive.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            BtnUploadToDrive.Location = new Point(47, 334);
+            BtnUploadToDrive.Name = "BtnUploadToDrive";
+            BtnUploadToDrive.Size = new Size(203, 48);
+            BtnUploadToDrive.TabIndex = 0;
+            BtnUploadToDrive.Text = "Upload To Google Drive";
+            BtnUploadToDrive.UseVisualStyleBackColor = true;
+            BtnUploadToDrive.Click += BtnUploadToDrive_Click;
             // 
             // radioButton1
             // 
@@ -268,7 +269,7 @@
             Controls.Add(textBox1);
             Controls.Add(radioButton2);
             Controls.Add(radioButton1);
-            Controls.Add(button1);
+            Controls.Add(BtnUploadToDrive);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             MinimizeBox = false;
@@ -282,7 +283,7 @@
 
         #endregion
 
-        private Button button1;
+        private Button BtnUploadToDrive;
         private RadioButton radioButton1;
         private RadioButton radioButton2;
         private TextBox textBox1;
