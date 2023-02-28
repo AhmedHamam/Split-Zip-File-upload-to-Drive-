@@ -1,8 +1,12 @@
-﻿using System;
+﻿using SplitZipFile;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Net;
+using System.Text;
 
 class Program
 {
@@ -10,11 +14,23 @@ class Program
     {
         try
         {
-            var sourceDirectory = @"D:\Test"; // Change this to the directory you want to split into zip files.
-            var outputDirectory = @"D:\ZipFiles"; // Change this to the directory where you want to save the zip files.
-            var maxZipFileSize = 50 * 1024 * 1024; // Change this to the maximum size (in bytes) of each zip file.
-            SplitDirectoryToZipFiles(sourceDirectory, outputDirectory, maxZipFileSize);
-            JoinSplitFiles(outputDirectory);
+            //var sourceDirectory = @"D:\Test"; // Change this to the directory you want to split into zip files.
+            //var outputDirectory = @"D:\ZipFiles"; // Change this to the directory where you want to save the zip files.
+            //var maxZipFileSize = 50 * 1024 * 1024; // Change this to the maximum size (in bytes) of each zip file.
+            //SplitDirectoryToZipFiles(sourceDirectory, outputDirectory, maxZipFileSize);
+            //JoinSplitFiles(outputDirectory);
+
+            //CreateSplitArchive(outputDirectory, sourceDirectory, "Test", 100000);
+            //upload();
+
+            string sourceDirectory = @"C:\\FTP";
+            string targetDirectory = "/public_html";
+            string host = "ftp://houseofarabic.com";
+            string username = "u885723119.akeedtech.com";
+            string password = "ASDasd@123";
+
+            FTPUploader.UploadDirectory(sourceDirectory, targetDirectory, host, username, password);
+
         }
         catch (Exception ex)
         {
@@ -182,5 +198,61 @@ class Program
         var relativePath = absolutePath.Substring(absoluteBasePath.Length).TrimStart(Path.DirectorySeparatorChar);
 
         return relativePath;
+    }
+    public static void CreateSplitArchive(string outputFilePath, string sourceFolderPath, string folderToArchiveName, int volumeSizeInKB)
+    {
+        // Define the command-line arguments
+        string arguments = string.Format("a -v{0} \"{1}\\\" \"{2}\\\"", volumeSizeInKB, outputFilePath, sourceFolderPath);
+        // string arguments = string.Format("a -v{0} \"{1}\\{2}\" \"{3}\\\"", volumeSizeInKB, outputFilePath, folderToArchiveName, sourceFolderPath);
+
+        // Output the command to the console or a log file
+        Console.WriteLine("WinRAR.exe {0}", arguments);
+
+        // Create a new process to execute the command
+        Process process = new Process();
+        process.StartInfo.FileName = "WinRAR.exe";
+        process.StartInfo.Arguments = arguments;
+        process.StartInfo.WorkingDirectory = sourceFolderPath;
+        process.StartInfo.UseShellExecute = false;
+        process.StartInfo.CreateNoWindow = true;
+
+        // Start the process and wait for it to finish
+        process.Start();
+        process.WaitForExit();
+    }
+    public static void upload()
+    {
+        string ftpServerUrl = "ftp://houseofarabic.com";
+        string ftpUsername = "u885723119.akeedtech.com";
+        string ftpPassword = "ASDasd@123";
+
+        string localFilePath = "C:\\FTP\\";
+        string remoteFilePath = "/public_html";
+
+        // Create a FTP request object
+        FtpWebRequest request = (FtpWebRequest)WebRequest.Create(new Uri(ftpServerUrl + remoteFilePath));
+        request.Method = WebRequestMethods.Ftp.UploadFile;
+        request.Credentials = new NetworkCredential(ftpUsername, ftpPassword);
+
+        // Read the local file into a byte array
+        byte[] fileContents;
+        using (StreamReader sourceStream = new StreamReader(localFilePath))
+        {
+            fileContents = Encoding.UTF8.GetBytes(sourceStream.ReadToEnd());
+        }
+
+        // Upload the file to the FTP server
+        request.ContentLength = fileContents.Length;
+        using (Stream requestStream = request.GetRequestStream())
+        {
+            requestStream.Write(fileContents, 0, fileContents.Length);
+        }
+
+        // Get the FTP server response
+        using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
+        {
+            Console.WriteLine($"Upload complete. Response: {response.StatusDescription}");
+        }
+
     }
 }
