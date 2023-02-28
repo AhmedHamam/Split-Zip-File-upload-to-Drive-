@@ -5,6 +5,8 @@ VisualStudioVersion = 17.3.32819.101
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SplitZipFile", "SplitZipFile\SplitZipFile\SplitZipFile.csproj", "{DB2732C9-C2D4-443F-BFDB-CD0929A49CEE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UploadFiles", "UploadFiles\UploadFiles.csproj", "{A4F7651C-EC5A-4ABC-99AD-BC7903D47D29}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{DB2732C9-C2D4-443F-BFDB-CD0929A49CEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB2732C9-C2D4-443F-BFDB-CD0929A49CEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB2732C9-C2D4-443F-BFDB-CD0929A49CEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4F7651C-EC5A-4ABC-99AD-BC7903D47D29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4F7651C-EC5A-4ABC-99AD-BC7903D47D29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4F7651C-EC5A-4ABC-99AD-BC7903D47D29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4F7651C-EC5A-4ABC-99AD-BC7903D47D29}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
