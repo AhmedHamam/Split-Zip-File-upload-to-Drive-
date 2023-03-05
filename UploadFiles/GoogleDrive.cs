@@ -1,4 +1,5 @@
 ﻿using Google.Apis.Auth.OAuth2;
+using Google.Apis.Download;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
@@ -9,10 +10,19 @@ namespace UploadFiles
     {
         private readonly string _clientSecretJsonPath;
         private readonly string _applicationName;
-        private readonly string _folderId;
+        private  string? _folderId;
         private readonly string _fileName;
-        private readonly string _filePath;
+        private  string _filePath;
 
+        //private constructor
+        private GoogleDrive()
+        {
+        }
+        public GoogleDrive(string clientSecretJsonPath,string applicationName)
+        {
+            _clientSecretJsonPath = clientSecretJsonPath;
+            _applicationName = applicationName;
+        }
         public GoogleDrive(string clientSecretJsonPath, string applicationName, string folderId, string fileName, string filePath)
         {
             _clientSecretJsonPath = clientSecretJsonPath;
@@ -21,6 +31,7 @@ namespace UploadFiles
             _fileName = fileName;
             _filePath = filePath;
         }
+
         #region Get Credential
         private UserCredential GetCredential()
         {
@@ -46,7 +57,7 @@ namespace UploadFiles
         private string GetCredentialPath()
         {
             string credPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-            return Path.Combine(credPath, ".credentials/drive-dotnet-quickstart.json");
+            return Path.Combine(credPath, ".credentials/drive-dotnet-quickstart2.json");
         }
         #endregion Get Credential
 
@@ -97,7 +108,6 @@ namespace UploadFiles
             var folders = result.Files;
             return folders;
         }
-
         /// <summary>
         /// create folder in google drive in root folder
         /// </summary>
@@ -116,7 +126,7 @@ namespace UploadFiles
         }
 
         /// <summary>
-        /// create folder in google drive under parent folder
+        /// create folder in google drive under parent folder with folder name
         /// </summary>
         /// <param name="folderName"> Folder Name </param>
         /// <param name="parentFolderId">Id of Parent Folder </param>
@@ -135,7 +145,7 @@ namespace UploadFiles
         }
 
         /// <summary>
-        /// create folder in google drive under parent folders
+        /// create folder in google drive under parent folders with folder name
         /// </summary>
         /// <param name="folderName">Folder Name </param>
         /// <param name="parentFolderIds">List Of Id for Parents folders </param>
@@ -153,9 +163,187 @@ namespace UploadFiles
             return file;
         }
 
+        // delete folder from google drive
+        public void DeleteFolder(string folderId)
+        {
+            var service = CreateDriveService();
+            service.Files.Delete(folderId).Execute();
+        }
+        //download folder from google drive
+        public void DownloadFolder(string folderId)
+        {
+            var service = CreateDriveService();
+            var request = service.Files.Get(folderId);
+            var file = request.Execute();
+            var folderName = file.Name;
+            var folderPath = Path.Combine(_filePath, folderName);
+            Directory.CreateDirectory(folderPath);
+            var files = GetFiles(folderId);
+            foreach (var item in files)
+            {
+                DownloadFile(item.Id, folderPath);
+            }
+            var folders = GetFolders(folderId);
+            foreach (var item in folders)
+            {
+                DownloadFolder(item.Id);
+            }
+        }
+        //download folder from google drive as zip file
+        public void DownloadFolderAsZip(string folderId)
+        {
+           
+        }
+
+
+        private void DownloadFile(string id, string folderPath)
+        {
+           //downlod file from google drive
+           var service = CreateDriveService();
+            var request = service.Files.Get(id);
+            var file = request.Execute();
+            var fileName = file.Name;
+            var filePath = Path.Combine(folderPath, fileName);
+            using (var stream = new System.IO.FileStream(filePath, System.IO.FileMode.Create))
+            {
+                request.MediaDownloader.ProgressChanged += (IDownloadProgress progress) =>
+                {
+                    switch (progress.Status)
+                    {
+                        case DownloadStatus.Downloading:
+                            {
+                                Console.WriteLine(progress.BytesDownloaded);
+                                break;
+                            }
+                        case DownloadStatus.Completed:
+                            {
+                                Console.WriteLine("Download complete.");
+                                break;
+                            }
+                        case DownloadStatus.Failed:
+                            {
+                                Console.WriteLine("Download failed.");
+                                break;
+                            }
+                    }
+                };
+                request.Download(stream);
+            }
+
+
+
+
+        }
         #endregion Folders
 
         #region Files
+        //change file permission
+        public void ChangeFilePermission(string fileId, string email, string role)
+        {
+            var service = CreateDriveService();
+            var newPermission = new Google.Apis.Drive.v3.Data.Permission();
+            newPermission.Type = "user";
+            newPermission.Role = role;
+            newPermission.EmailAddress = email;
+            var request = service.Permissions.Create(newPermission, fileId);
+            request.Execute();
+        }
+        public void ChangeFilePermission(string fileId,string role)
+        {
+            var service = CreateDriveService();
+            var newPermission = new Google.Apis.Drive.v3.Data.Permission();
+            newPermission.Type = "anyone";
+            newPermission.Role = role;
+            var request = service.Permissions.Create(newPermission, fileId);
+            request.Execute();
+        }
+       
+
+      
+        //allow list of users to access file
+        public void ChangeFilePermission(string fileId, List<string> emails, string role)
+        {
+            var service = CreateDriveService();
+            foreach (var email in emails)
+            {
+                var newPermission = new Google.Apis.Drive.v3.Data.Permission();
+                newPermission.Type = "user";
+                newPermission.Role = role;
+                newPermission.EmailAddress = email;
+                var request = service.Permissions.Create(newPermission, fileId);
+                request.Execute();
+            }
+        }
+
+
+        //get file from google drive
+        public Google.Apis.Drive.v3.Data.File GetFile(string fileId)
+        {
+            var service = CreateDriveService();
+            var request = service.Files.Get(fileId);
+            var file = request.Execute();
+            return file;
+        }
+        //get list of files under parent folder
+        public IEnumerable<Google.Apis.Drive.v3.Data.File>? GetFilesFromGoogleDrive(string parentId)
+        {
+            var service = CreateDriveService();
+            var request = service.Files.List();
+            request.Q = $"'{parentId}' in parents";
+            request.Fields = "nextPageToken, files(id, name)";
+            var result = request.Execute();
+            var files = result.Files;
+            return files;
+        }
+        //get list of files from google drive root folder
+        public IEnumerable<Google.Apis.Drive.v3.Data.File>? GetFilesFromGoogleDrive()
+        {
+            var service = CreateDriveService();
+            var request = service.Files.List();
+            request.Q = "mimeType!='application/vnd.google-apps.folder'";
+            request.Fields = "nextPageToken, files(id, name)";
+            var result = request.Execute();
+            var files = result.Files;
+            return files;
+        }
+        // create file in google drive in root folder
+        public Google.Apis.Drive.v3.Data.File CreateFile(string fileName, string mimeType, string description, string folderId)
+        {
+            var service = CreateDriveService();
+            var fileMetadata = new Google.Apis.Drive.v3.Data.File();
+            fileMetadata.Name = fileName;
+            fileMetadata.MimeType = mimeType;
+            fileMetadata.Description = description;
+            fileMetadata.Parents = new List<string>() { folderId };
+            var request = service.Files.Create(fileMetadata);
+            request.Fields = "id";
+            var file = request.Execute();
+            return file;
+        }   
+        // create file in google drive under parent folder
+        public Google.Apis.Drive.v3.Data.File CreateFile(string fileName, string mimeType, string description, string folderId, string parentFolderId)
+        {
+            var service = CreateDriveService();
+            var fileMetadata = new Google.Apis.Drive.v3.Data.File();
+            fileMetadata.Name = fileName;
+            fileMetadata.MimeType = mimeType;
+            fileMetadata.Description = description;
+            fileMetadata.Parents = new List<string>() { folderId, parentFolderId };
+            var request = service.Files.Create(fileMetadata);
+            request.Fields = "id";
+            var file = request.Execute();
+            return file;
+        }
+
+        //delete file from google drive
+        public void DeleteFile(string fileId)
+        {
+            var service = CreateDriveService();
+            var request = service.Files.Delete(fileId);
+            request.Execute();
+        }
+
+
         #endregion Files
 
 
@@ -167,12 +355,40 @@ namespace UploadFiles
 
         public void Upload()
         {
-            var service = CreateDriveService();
-            var fileMetadata = CreateFileMetadata();
-            var file = UploadFile(service, fileMetadata);
-            MessageBox.Show("File ID: " + file.Id);
-        }
+            try
+            {
+                var service = CreateDriveService();
+                var fileMetadata = CreateFileMetadata();
 
+                var file = UploadFile(service, fileMetadata);
+                MessageBox.Show("File ID: " + file?.Id);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                throw;
+            }
+           
+        }
+        public void Upload(string filePath,string? folderId)
+        {
+            try
+            {
+                var service = CreateDriveService();
+                _filePath= filePath;
+                _folderId = folderId;
+                var fileMetadata = CreateFileMetadata();
+                var file = UploadFile(service, fileMetadata);
+                MessageBox.Show("File ID: " + file?.Id);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                throw;
+            }
+
+
+        }
         private DriveService CreateDriveService()
         {
             var credential = GetCredential();
@@ -214,12 +430,25 @@ namespace UploadFiles
         private Google.Apis.Drive.v3.Data.File UploadFile(DriveService service, Google.Apis.Drive.v3.Data.File fileMetadata)
         {
             FilesResource.CreateMediaUpload request;
+
+            
             using (var stream = new FileStream(_filePath, FileMode.Open))
             {
                 request = service.Files.Create(
                                        fileMetadata, stream, "");
                 request.Fields = "id";
+
                 request.Upload();
+                //get uploaded bytes
+
+                var uploadedBytes = request.ResponseBody.Size;
+                //get total bytes
+                var totalBytes = stream.Length;
+                //get percentage
+                var percentage = (uploadedBytes * 100) / totalBytes;
+                Console.WriteLine(percentage);
+
+                
             }
 
             return request.ResponseBody;

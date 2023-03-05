@@ -1,6 +1,6 @@
 ﻿namespace UploadFiles
 {
-    partial class Form1
+    partial class MainForm
     {
         /// <summary>
         ///  Required designer variable.
@@ -43,17 +43,16 @@
             label4 = new Label();
             button2 = new Button();
             button3 = new Button();
-            progressBar1 = new ProgressBar();
-            label5 = new Label();
-            label6 = new Label();
-            label7 = new Label();
+            label8 = new Label();
+            BtnGetCredential = new Button();
+            TxtCredential = new TextBox();
             ((System.ComponentModel.ISupportInitialize)NudSize).BeginInit();
             SuspendLayout();
             // 
             // BtnUploadToDrive
             // 
             BtnUploadToDrive.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            BtnUploadToDrive.Location = new Point(47, 334);
+            BtnUploadToDrive.Location = new Point(28, 497);
             BtnUploadToDrive.Name = "BtnUploadToDrive";
             BtnUploadToDrive.Size = new Size(203, 48);
             BtnUploadToDrive.TabIndex = 0;
@@ -189,7 +188,7 @@
             // button2
             // 
             button2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            button2.Location = new Point(301, 334);
+            button2.Location = new Point(282, 497);
             button2.Name = "button2";
             button2.Size = new Size(203, 48);
             button2.TabIndex = 17;
@@ -199,62 +198,52 @@
             // button3
             // 
             button3.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            button3.Location = new Point(540, 334);
+            button3.Location = new Point(521, 497);
             button3.Name = "button3";
             button3.Size = new Size(203, 48);
             button3.TabIndex = 18;
             button3.Text = "Upload To Api";
             button3.UseVisualStyleBackColor = true;
             // 
-            // progressBar1
+            // label8
             // 
-            progressBar1.Location = new Point(217, 256);
-            progressBar1.Name = "progressBar1";
-            progressBar1.Size = new Size(427, 23);
-            progressBar1.TabIndex = 19;
+            label8.AutoSize = true;
+            label8.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            label8.ForeColor = Color.Red;
+            label8.Location = new Point(12, 256);
+            label8.Name = "label8";
+            label8.Size = new Size(89, 21);
+            label8.TabIndex = 23;
+            label8.Text = "Credential";
             // 
-            // label5
+            // BtnGetCredential
             // 
-            label5.AutoSize = true;
-            label5.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            label5.ForeColor = Color.Red;
-            label5.Location = new Point(62, 258);
-            label5.Name = "label5";
-            label5.Size = new Size(128, 21);
-            label5.TabIndex = 20;
-            label5.Text = "Upload Precent";
+            BtnGetCredential.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            BtnGetCredential.Location = new Point(677, 260);
+            BtnGetCredential.Name = "BtnGetCredential";
+            BtnGetCredential.Size = new Size(119, 29);
+            BtnGetCredential.TabIndex = 25;
+            BtnGetCredential.Text = "Open";
+            BtnGetCredential.UseVisualStyleBackColor = true;
+            BtnGetCredential.Click += BtnGetCredential_Click;
             // 
-            // label6
+            // TxtCredential
             // 
-            label6.AutoSize = true;
-            label6.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            label6.ForeColor = Color.Red;
-            label6.Location = new Point(62, 296);
-            label6.Name = "label6";
-            label6.Size = new Size(117, 21);
-            label6.TabIndex = 21;
-            label6.Text = "Upload Speed";
-            // 
-            // label7
-            // 
-            label7.AutoSize = true;
-            label7.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            label7.ForeColor = Color.Red;
-            label7.Location = new Point(217, 296);
-            label7.Name = "label7";
-            label7.Size = new Size(117, 21);
-            label7.TabIndex = 22;
-            label7.Text = "Upload Speed";
+            TxtCredential.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            TxtCredential.Location = new Point(217, 256);
+            TxtCredential.Name = "TxtCredential";
+            TxtCredential.ReadOnly = true;
+            TxtCredential.Size = new Size(427, 29);
+            TxtCredential.TabIndex = 24;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 392);
-            Controls.Add(label7);
-            Controls.Add(label6);
-            Controls.Add(label5);
-            Controls.Add(progressBar1);
+            ClientSize = new Size(800, 577);
+            Controls.Add(BtnGetCredential);
+            Controls.Add(TxtCredential);
+            Controls.Add(label8);
             Controls.Add(button3);
             Controls.Add(button2);
             Controls.Add(label4);
@@ -298,9 +287,8 @@
         private Label label4;
         private Button button2;
         private Button button3;
-        private ProgressBar progressBar1;
-        private Label label5;
-        private Label label6;
-        private Label label7;
+        private Label label8;
+        private Button BtnGetCredential;
+        private TextBox TxtCredential;
     }
 }
