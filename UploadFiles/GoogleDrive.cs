@@ -3,6 +3,7 @@ using Google.Apis.Download;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
+using System.IO.Compression;
 
 namespace UploadFiles
 {
@@ -192,8 +193,26 @@ namespace UploadFiles
         //download folder from google drive as zip file
         public void DownloadFolderAsZip(string folderId)
         {
-           
+            var service = CreateDriveService();
+            var request = service.Files.Get(folderId);
+            var file = request.Execute();
+            var folderName = file.Name;
+            var folderPath = Path.Combine(_filePath, folderName);
+            Directory.CreateDirectory(folderPath);
+            var files = GetFiles(folderId);
+            foreach (var item in files)
+            {
+                DownloadFile(item.Id, folderPath);
+            }
+            var folders = GetFolders(folderId);
+            foreach (var item in folders)
+            {
+                DownloadFolder(item.Id);
+            }
+            ZipFile.CreateFromDirectory(folderPath, folderPath + ".zip");
+            Directory.Delete(folderPath, true);
         }
+     
 
 
         private void DownloadFile(string id, string folderPath)
